@@ -19,12 +19,39 @@ import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
 
+    SensorManager sensorMgr;
+    Sensor accelerometer;
+
+    SensorEventListener accelListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            Log.i("TAG", "" + event.values[0] +
+                    ", " + event.values[1] +
+                    ", " + event.values[2]);
+            xa = event.values[0];
+            ya = event.values[1];
+            za = event.values[2];
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {}
+    };
+
+
+    private float x,xa,xs,xmax;
+    private float y,ya,ys,ymax;
+    private float z,za,zs,zmax;
+    float frameTime = 0.666f;
+    private int radius;
+    private Paint paint;
+
+
     // Create a custom view class extending View
     public class GraphicView extends View {
-        private int x;
-        private int y;
-        private int radius;
-        private Paint paint;
+//        private float x,xs,xmax;
+//        private float y,ya,ys,ymax;
+//        private float z,za,zs,zmax;
+//        private int radius;
+//        private Paint paint;
 
         public GraphicView(Context context) {
             super(context);
@@ -38,12 +65,25 @@ public class MainActivity extends AppCompatActivity {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
-
-
             canvas.drawCircle(x,y,radius, paint);
 
-            x-=2;
-            y-=2;
+            x=x+xa*frameTime*frameTime/2;
+            y=y+ya*frameTime*frameTime/2;
+
+            if (x > getWidth()) {
+                x = getWidth();
+            } else if (x < 0) {
+                x = 0;
+            }
+
+            if (y > getHeight()) {
+                y = getHeight();
+            } else if (y < 0) {
+                y = 0;
+            }
+
+//            x-=2;
+//            y-=2;
 
             // Animate the ball using invalidate
             invalidate();
@@ -59,20 +99,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    SensorManager sensorMgr;
-    Sensor accelerometer;
-
-    SensorEventListener accelListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            Log.i("TAG", "" + event.values[0] +
-                    ", " + event.values[1] +
-                    ", " + event.values[2]);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {}
-    };
 
 
     @Override
