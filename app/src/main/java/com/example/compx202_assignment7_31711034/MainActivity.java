@@ -5,9 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
+import android.content.pm.FeatureInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
+
+
             canvas.drawCircle(x,y,radius, paint);
 
             x-=2;
@@ -50,6 +59,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    SensorManager sensorMgr;
+    Sensor accelerometer;
+
+    SensorEventListener accelListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            Log.i("TAG", "" + event.values[0] +
+                    ", " + event.values[1] +
+                    ", " + event.values[2]);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {}
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,18 +83,41 @@ public class MainActivity extends AppCompatActivity {
         // Hide the action bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
-
         // Set sticky immersive fullscreen mode
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         getWindow().getDecorView().setSystemUiVisibility(uiOptions);
 
         // Get the ConstraintLayout
         ConstraintLayout root = (ConstraintLayout)findViewById(R.id.MainView);
-
         // Create an instance of the custom view
         GraphicView myView = new GraphicView(this);
-
         // Add the customview to the ConstraintLayout
         root.addView(myView);
+
+        PackageManager manager = getPackageManager();
+        for (FeatureInfo fi : manager.getSystemAvailableFeatures()){
+            Log.d("MYTAG", fi.toString());
+        }
+//        check Accelerometer sensor
+        if (manager.hasSystemFeature(PackageManager.FEATURE_SENSOR_ACCELEROMETER)) {
+            Log.d("MYTAG", "Have accelerometer");
+        }
+
+        sensorMgr = (SensorManager)getSystemService(SENSOR_SERVICE);
+        accelerometer = sensorMgr.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Log.d("TAG", "Obtained accelerometer " + accelerometer);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorMgr.registerListener(accelListener, accelerometer,
+                SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorMgr.unregisterListener(accelListener, accelerometer);
     }
 }
