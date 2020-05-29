@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private float x,xa,xs,xmax;
-    private float y,ya,ys,ymax;
+    private float x,xa,xv,xmax;
+    private float y,ya,yv,ymax;
 //    private float z,za,zs,zmax;
-    float frameTime = 2f;
+    float frameTime = 0.10f;
     private int radius;
     private Paint paint;
 
@@ -67,8 +67,16 @@ public class MainActivity extends AppCompatActivity {
 
             canvas.drawCircle(x,y,radius, paint);
 
-            x=x-xa*frameTime*frameTime/2;
-            y=y+ya*frameTime*frameTime/2;
+//            x=x-xa*frameTime*frameTime/2;
+//            y=y+ya*frameTime*frameTime/2;
+
+            x-=xv*frameTime;
+            xv+=xa*frameTime;
+            x-=xv*frameTime/2;
+
+            y+=yv*frameTime;
+            yv+=ya*frameTime;
+            y+=yv*frameTime/2;
 
 //            make ball always stay on screen
             if (x > getWidth()) {
