@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
                     ", " + event.values[2]);
             xa = event.values[0];
             ya = event.values[1];
-            za = event.values[2];
+//            za = event.values[2];
         }
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) {}
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     private float x,xa,xs,xmax;
     private float y,ya,ys,ymax;
-    private float z,za,zs,zmax;
+//    private float z,za,zs,zmax;
     float frameTime = 2f;
     private int radius;
     private Paint paint;
